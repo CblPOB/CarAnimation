@@ -13,11 +13,13 @@ class RoadViewController: UIViewController {
     private var carControlRecognizer: UITapGestureRecognizer?
     private var carView: UIView!
     private let turnArcRadius: Double = 50.0
-
+    private var animationBuilder: CarAnimationBuilder?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupCarView()
         setupGestureRecognizer()
+        animationBuilder = CarAnimationBuilder()
     }
     
     func setupCarView() {
@@ -41,55 +43,19 @@ class RoadViewController: UIViewController {
     
     @objc func tapAction(_ sender: UIGestureRecognizer) {
         let newPoint = sender.location(in: view)
-        carView.layer.add(calculateArcAnimationEndPoint(tapPoint: newPoint), forKey: nil)
+//        carView.layer.add(arcAnimation(tapPoint: newPoint), forKey: nil)
+//        let positionAnimation = CarAnimationBuilder.build(animation: .position, endPoint: newPoint, carCenter: carView.center, carFrame: carView.frame)
+//        let rotateAnimation = CarAnimationBuilder.build(animation: .rotate, endPoint: newPoint, carCenter: carView.center, carFrame: carView.frame)
+//        carView.layer.add(positionAnimation, forKey: nil)
+//        carView.layer.add(rotateAnimation, forKey: nil)
+        animationBuilder?.build(animation: .position, endPoint: newPoint, carCenter: carView.center, carFrame: carView.frame, layer: carView.layer)
     }
     
     func calculateAngle(firstVector: CGPoint, secondVector: CGPoint) -> CGFloat {
         return acos((firstVector.x * secondVector.x + firstVector.y * secondVector.y) / (sqrt(pow(firstVector.x, 2) + pow(firstVector.y, 2)) * sqrt(pow(secondVector.x, 2) + pow(secondVector.y, 2))))
     }
     
-    func calculateArcAnimationEndPoint(tapPoint: CGPoint) -> CAKeyframeAnimation {
-//        let carFrontCenterPoint = CGPoint(x: carView.frame.origin.x + carView.frame.width / 2.0, y: carView.frame.origin.y)
-//        let carBackCenterPoint = CGPoint(x: carView.frame.origin.x + carView.frame.width / 2.0, y: carView.frame.origin.y + carView.frame.height)
-//        let carCenterPoint = carView.center
-//        let carViewCenterStraightCoefficient = (carFrontCenterPoint.y - carBackCenterPoint.y) / (carFrontCenterPoint.x - carBackCenterPoint.y)
-//
-//        // center of arc circle
-//
-//        let circleY = sqrt(pow(turnArcRadius, 2) / Double(pow(2 * carViewCenterStraightCoefficient - 1, 2) + 2 * carViewCenterStraightCoefficient)) + Double(carCenterPoint.y)
-//        let circleX = (pow(turnArcRadius, 2) - pow(circleY - Double(carCenterPoint.y), 2) * pow(1 - Double(carViewCenterStraightCoefficient), 2)) / -2 * Double(carViewCenterStraightCoefficient) * (circleY - Double(carCenterPoint.y))
-//
-//        // center of tmp circle which to find end point
-//
-//        let tmpCircleY = (Double(tapPoint.y) + circleY) / 2.0
-//        let tmpCircleX = (Double(tapPoint.x) + circleX) / 2.0
-//
-//        let tmpR = pow(Double(tapPoint.x) - tmpCircleX, 2) + pow(Double(tapPoint.y) - tmpCircleY, 2)
-//        let r = pow(circleX - Double(carCenterPoint.x), 2) + pow(circleY - Double(carCenterPoint.y), 2)
-//        let a = 2 * (circleX - tmpCircleX)
-//        let b = 2 * (circleY - tmpCircleY)
-//        let c = pow(tmpCircleX, 2) - pow(circleX, 2) + pow(tmpCircleY, 2) - pow(circleY, 2) - tmpR + r
-//
-//        let x0 = (-a * c) / (pow(a, 2) + pow(b, 2))
-//        let y0 = (-b * c) / (pow(a, 2) + pow(b, 2))
-//        let d = tmpR - (pow(c, 2) / (pow(a, 2) + pow(b, 2)))
-//        let mult = sqrt(d / (pow(a, 2) + pow(b, 2)))
-//        let fPointX = x0 + b * mult
-//        let sPointX = x0 - b * mult
-//        let fPointY = y0 - a * mult
-//        let sPointY = y0 + a * mult
-//
-//
-//        let circle = CGPoint(x: carCenterPoint.x + CGFloat(turnArcRadius), y: carCenterPoint.y + CGFloat(turnArcRadius))
-//        let startAngle = calculateAngle(firstVector: CGPoint(x: carCenterPoint.x - circle.x, y: carCenterPoint.y - circle.y),
-//                                        secondVector: CGPoint(x: circle.x + 10, y: circle.y))
-//        let endAngle = calculateAngle(firstVector: CGPoint(x: 10, y: 0),
-//                                      secondVector: CGPoint(x: fPointX - circleX, y: fPointY - circleY))
-        
-//        let path = CGMutablePath()
-//        path.addArc(center: CGPoint(x: carCenterPoint.x + CGFloat(turnArcRadius), y: carCenterPoint.y + CGFloat(turnArcRadius)), radius: CGFloat(turnArcRadius), startAngle: startAngle, endAngle: .pi / -2.0, clockwise: false)
-//        path.move(to: carCenterPoint)
-        
+    func arcAnimation(tapPoint: CGPoint) -> CAKeyframeAnimation {
         let path = UIBezierPath()
         path.move(to: carView.center)
         path.addQuadCurve(to: tapPoint, controlPoint: calculateArcPoint(finishLocation: tapPoint))
@@ -109,7 +75,6 @@ class RoadViewController: UIViewController {
         let perpendicularVector = CGPoint(x: perpendicularVectorX, y: perpendicularVectorY)
         let angleWithPerpendicular = calculateAngle(firstVector: carVector, secondVector: perpendicularVector)
         let angleWithDestination = calculateAngle(firstVector: carVector, secondVector: destinationVector)
-        
         
         let angleWithPerpendecularDegrees = angleWithPerpendicular * 180 / .pi
         let angleWithDestinationDegrees = angleWithDestination * 180 / .pi
