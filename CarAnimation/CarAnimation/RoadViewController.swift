@@ -16,8 +16,8 @@ class RoadViewController: UIViewController {
     private var animationBuilder: CarAnimationBuilder?
     private var angle: Float = 0.0
     private let eps: Float = .pi / 40.0
-    private let speed: Float = 70.0
-    private let turnSpeed: Float = .pi / 6.0
+    private let speed: Float = 200.0
+    private let turnSpeed: Float = .pi
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,7 +62,7 @@ class RoadViewController: UIViewController {
     func animate(endPoint: CGPoint,  carCenter: CGPoint, carFrame: CGRect) {
         let carFrontPoint = CGPoint(x: carFrame.minX + carFrame.width / 2.0, y: carFrame.minY)
         var carVector = Vector(firstPoint: carCenter, secondPoint: carFrontPoint).rotated(angle: CGFloat(angle))
-        let destinationVector = Vector(x: endPoint.x - carCenter.x, y: endPoint.y - carCenter.y)
+        var destinationVector = Vector(x: endPoint.x - carCenter.x, y: endPoint.y - carCenter.y)
         let destinationVectorPerpendicular = destinationVector.rotated(angle: -.pi / 2.0)
         let angleWithPerpendicular = destinationVectorPerpendicular.angle(withVector: carVector)
         let angleWithDestination = destinationVector.angle(withVector: carVector)
@@ -100,8 +100,7 @@ class RoadViewController: UIViewController {
         var newPositionX: Float = 0.0
         var newPositionY: Float = 0.0
         var newVector = vectorToCarFromCenter
-        while carVector.angle(withVector: destinationVector) > eps {
-//        while animationBuilder!.angle(endPoint: endPoint, carCenter: carCenter, carVector: carVector) > eps {
+        while carVector.angle(withVector: destinationVector) >= eps {
 //            if (step < 0) {
 //                newPositionX = turnCircleRadius * tan(endAngle + step) + Float(turnCircleCenter.x)
 //                newPositionY = turnCircleRadius * atan(endAngle + step) + Float(turnCircleCenter.y)
@@ -112,10 +111,16 @@ class RoadViewController: UIViewController {
             newVector = newVector.rotated(angle: CGFloat(startAngle + (clockwise ? -eps: eps)))
             newPositionX = newVector.x + Float(turnCircleCenter.x)
             newPositionY = newVector.y + Float(turnCircleCenter.y)
-            let newCarVector = Vector(x: Float(turnCircleCenter.x) - newPositionX, y: Float(turnCircleCenter.y) - newPositionY).rotated(angle: .pi / 2.0)
+            let newCarVector = Vector(x: Float(turnCircleCenter.x) - newPositionX, y: Float(turnCircleCenter.y) - newPositionY).rotated(angle: ( clockwise ? -.pi / 2.0: -.pi / 2.0))
             carVector = newCarVector
+            destinationVector = Vector(x: Float(endPoint.x) - newPositionX, y: Float(endPoint.y) - newPositionY)
             angles.append(clockwise ? angles.last! + eps: angles.last! - eps)
-            endAngle += eps
+            endAngle += (clockwise ? -eps: eps)
+            
+            let carPath = UIBezierPath()
+            carPath.move(to: carCenter)
+            carPath.addLine(to: CGPoint(x: CGFloat(carVector.x) + CGFloat(newPositionX), y: CGFloat(carVector.y) + CGFloat(newPositionY)))
+            carPath.addLine(to: .zero)
         }
         
         angles.append(-carVector.angle(withVector: destinationVector))
@@ -131,24 +136,24 @@ class RoadViewController: UIViewController {
         
         let arcAnimation = CAKeyframeAnimation(keyPath: "position")
         arcAnimation.path = path.cgPath
-        arcAnimation.duration = Double(timeInTurn + timeInRide)
+        arcAnimation.duration = Double(timeInRide + timeInTurn)
         arcAnimation.fillMode = .forwards
         arcAnimation.isRemovedOnCompletion = false
         
-//        let rotation = CAKeyframeAnimation(keyPath: "transform.rotation")
-//        rotation.values = angles
-//        rotation.duration = 2.0
-//        rotation.fillMode = .forwards
-//        rotation.isRemovedOnCompletion = false
-
-        let rotation = CABasicAnimation(keyPath: "transform.rotation")
-//        rotation.values = angles
-        rotation.toValue = animationBuilder?.angle(animation: .rotate, endPoint: endPoint, carCenter: carCenter, carFrame: carFrame)
-        rotation.duration = Double(timeInTurn)
+        let rotation = CAKeyframeAnimation(keyPath: "transform.rotation")
+        rotation.values = angles
+        rotation.duration = 2.0
         rotation.fillMode = .forwards
         rotation.isRemovedOnCompletion = false
+
+//        let rotation = CABasicAnimation(keyPath: "transform.rotation")
+////        rotation.values = angles
+//        rotation.toValue = animationBuilder!.angle(animation: .rotate, endPoint: endPoint, carCenter: carCenter, carFrame: carFrame)
+//        rotation.duration = Double(timeInTurn + timeInRide)
+//        rotation.fillMode = .forwards
+//        rotation.isRemovedOnCompletion = false
         
-        angle = Float(atan2(Double(carVector.y), Double(carVector.x))) + .pi / 2.0
+        angle = Float(atan2(Double(carVector.y), Double(carVector.x))) - .pi / 2.0
         
         CATransaction.setDisableActions(true)
         carView.center = endPoint
