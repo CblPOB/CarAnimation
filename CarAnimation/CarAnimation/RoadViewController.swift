@@ -16,8 +16,8 @@ class RoadViewController: UIViewController {
     private var animationBuilder: CarAnimationBuilder?
     private var angle: Float = 0.0
     private let eps: Float = .pi / 40.0
-    private let speed: Float = 70.0
-    private let turnSpeed: Float = .pi / 6.0
+    private let speed: Float = 200.0
+    private let turnSpeed: Float = .pi
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -145,12 +145,12 @@ class RoadViewController: UIViewController {
         let rotation = CABasicAnimation(keyPath: "transform.rotation")
 //        rotation.values = angles
         rotation.toValue = animationBuilder?.angle(animation: .rotate, endPoint: endPoint, carCenter: carCenter, carFrame: carFrame)
-        rotation.duration = Double(timeInTurn)
+        rotation.duration = Double(timeInTurn + timeInRide)
         rotation.fillMode = .forwards
         rotation.isRemovedOnCompletion = false
         
         angle = Float(atan2(Double(carVector.y), Double(carVector.x))) + .pi / 2.0
-        
+//        angle = Float(atan2(Double(vectorToCarFromCenter.y), Double(vectorToCarFromCenter.x))) + .pi / 2.0
         CATransaction.setDisableActions(true)
         carView.center = endPoint
         carView.transform = CGAffineTransform(rotationAngle: CGFloat(angle))
