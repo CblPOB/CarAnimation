@@ -62,7 +62,7 @@ class RoadViewController: UIViewController {
     func animate(endPoint: CGPoint,  carCenter: CGPoint, carFrame: CGRect) {
         let carFrontPoint = CGPoint(x: carFrame.minX + carFrame.width / 2.0, y: carFrame.minY)
         var carVector = Vector(firstPoint: carCenter, secondPoint: carFrontPoint).rotated(angle: CGFloat(angle))
-        let destinationVector = Vector(x: endPoint.x - carCenter.x, y: endPoint.y - carCenter.y)
+        var destinationVector = Vector(x: endPoint.x - carCenter.x, y: endPoint.y - carCenter.y)
         let destinationVectorPerpendicular = destinationVector.rotated(angle: -.pi / 2.0)
         let angleWithPerpendicular = destinationVectorPerpendicular.angle(withVector: carVector)
         let angleWithDestination = destinationVector.angle(withVector: carVector)
@@ -101,7 +101,6 @@ class RoadViewController: UIViewController {
         var newPositionY: Float = 0.0
         var newVector = vectorToCarFromCenter
         while carVector.angle(withVector: destinationVector) > eps {
-//        while animationBuilder!.angle(endPoint: endPoint, carCenter: carCenter, carVector: carVector) > eps {
 //            if (step < 0) {
 //                newPositionX = turnCircleRadius * tan(endAngle + step) + Float(turnCircleCenter.x)
 //                newPositionY = turnCircleRadius * atan(endAngle + step) + Float(turnCircleCenter.y)
@@ -109,13 +108,15 @@ class RoadViewController: UIViewController {
 //                newPositionX = turnCircleRadius * cosf(endAngle + step) + Float(turnCircleCenter.x)
 //                newPositionY = turnCircleRadius * sinf(endAngle + step) + Float(turnCircleCenter.y)
 //            }
-            newVector = newVector.rotated(angle: CGFloat(startAngle + (clockwise ? -eps: eps)))
+            newVector = newVector.rotated(angle: CGFloat((clockwise ? eps: -eps)))
             newPositionX = newVector.x + Float(turnCircleCenter.x)
             newPositionY = newVector.y + Float(turnCircleCenter.y)
-            let newCarVector = Vector(x: Float(turnCircleCenter.x) - newPositionX, y: Float(turnCircleCenter.y) - newPositionY).rotated(angle: .pi / 2.0)
+            let newCarVector = Vector(x: Float(turnCircleCenter.x) - newPositionX, y: Float(turnCircleCenter.y) - newPositionY).rotated(angle: clockwise ? -.pi / 2.0: .pi / 2.0)
+            destinationVector = Vector(x: Float(endPoint.x) - newPositionX, y: Float(endPoint.y) - newPositionY)
             carVector = newCarVector
+            let angle = carVector.angle(withVector: destinationVector)
             angles.append(clockwise ? angles.last! + eps: angles.last! - eps)
-            endAngle += eps
+            endAngle += clockwise ? eps: -eps
         }
         
         angles.append(-carVector.angle(withVector: destinationVector))
