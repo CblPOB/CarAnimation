@@ -122,7 +122,7 @@ class RoadViewController: UIViewController {
         let firstValue = abs((Float(atan2(Double(carVector.y), Double(carVector.x))) + Float(.pi / 2.0)) - angle)
         let secondValue = abs((Float(atan2(Double(carVector.y), Double(carVector.x))) + Float(.pi / 2.0) - 2 * .pi) - angle)
         var endValue: Float = 0.0
-        if (firstValue <= secondValue) {
+        if firstValue <= secondValue {
             endValue = Float(atan2(Double(carVector.y), Double(carVector.x))) + Float(.pi / 2.0)
         } else {
             endValue = Float(atan2(Double(carVector.y), Double(carVector.x))) + Float(.pi / 2.0) - 2 * .pi
