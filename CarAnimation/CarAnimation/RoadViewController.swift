@@ -13,7 +13,6 @@ class RoadViewController: UIViewController {
     private var carControlRecognizer: UITapGestureRecognizer?
     private var carView: UIView!
     private let turnArcRadius: Double = 50.0
-    private var animationBuilder: CarAnimationBuilder?
     private var angle: Float = 0.0
     private let eps: Float = .pi / 40.0
     private let speed: Float = 100.0
@@ -23,7 +22,6 @@ class RoadViewController: UIViewController {
         super.viewDidLoad()
         setupCarView()
         setupGestureRecognizer()
-        animationBuilder = CarAnimationBuilder()
     }
     
     func setupCarView() {
@@ -47,61 +45,52 @@ class RoadViewController: UIViewController {
     
     @objc func tapAction(_ sender: UIGestureRecognizer) {
         let newPoint = sender.location(in: view)
-        
-//        animationBuilder?.buildAnimation(endPoint: newPoint, carCenter: carView.center, carFrame: carView.frame, layer: carView.layer)
         animate(endPoint: newPoint, carCenter: carView.center, carFrame: carView.frame)
-        
-//
-//        UIView.animate(withDuration: 0.2, animations: {
-//            self.carView.transform = CGAffineTransform(rotationAngle: self.animationBuilder!.angle(animation: .position, endPoint: newPoint, carCenter: self.carView.center, carFrame: self.carView.frame))
-//        }) { (_) in
-//            self.carView.center = newPoint;
-//        }
     }
     
     func animate(endPoint: CGPoint,  carCenter: CGPoint, carFrame: CGRect) {
+        
         let carFrontPoint = CGPoint(x: carFrame.minX + carFrame.width / 2.0, y: carFrame.minY)
-        var carVector = Vector(firstPoint: carCenter, secondPoint: carFrontPoint).rotated(angle: CGFloat(angle))
+        var carVector = Vector(firstPoint: carCenter, secondPoint: carFrontPoint).rotated(angle: CGFloat(angle)) // вектор повернут на угол, заданный предыдущим поворотом
         var destinationVector = Vector(x: endPoint.x - carCenter.x, y: endPoint.y - carCenter.y)
+        
+        /// второй верктор, перпендикулярный вектору к конечной точке, нужен для того, чтобы по двум углам (вектора машины с конеченой точкой и с destinationVectorPerpendicular) определить, в какую сторону направлен вектор автомобиля относительно endPoint и затем на основе этого выбрать, в какую сторону нужно отложить окружность для поворота
+        
         let destinationVectorPerpendicular = destinationVector.rotated(angle: -.pi / 2.0)
         let angleWithPerpendicular = destinationVectorPerpendicular.angle(withVector: carVector)
         let angleWithDestination = destinationVector.angle(withVector: carVector)
         let angleWithPerpendicularDegrees = angleWithPerpendicular * 180 / .pi
         let angleWithDestinationDegrees = angleWithDestination * 180 / .pi
+        
+        
         var newAngleForCarVector: CGFloat = 0.0
-
         var clockwise = false
-        var correctionValue: Float = 0.0
         if angleWithPerpendicularDegrees < 90, angleWithDestinationDegrees < 90 {
             newAngleForCarVector = .pi / 2.0
             clockwise = true
         } else if angleWithPerpendicularDegrees >= 90, angleWithDestinationDegrees < 90 {
             newAngleForCarVector = -.pi / 2.0
-//            correctionValue = -(2 * .pi)
         } else if angleWithPerpendicularDegrees >= 90, angleWithDestinationDegrees >= 90 {
             newAngleForCarVector = -.pi / 2.0
-//            correctionValue = -(2 * .pi)
         } else if angleWithPerpendicularDegrees < 90, angleWithDestinationDegrees >= 90 {
             newAngleForCarVector = .pi / 2.0
             clockwise = true
-//            correctionValue = -(2 * .pi)
         }
         
-        let carVectorPerpendicular = carVector.rotated(angle: newAngleForCarVector)
+        let carVectorPerpendicular = carVector.rotated(angle: newAngleForCarVector) /// для получения координат центра окружности используется вектор, перпендикулярный вектору автомобиля
         let turnCircleCenter = CGPoint(x: CGFloat(carVectorPerpendicular.x) + carCenter.x, y: CGFloat(carVectorPerpendicular.y) + carCenter.y)
         let turnCircleRadius = carVectorPerpendicular.length()
         
-        var vectorToCarFromCenter = Vector(x: carCenter.x - turnCircleCenter.x, y: carCenter.y - turnCircleCenter.y)
-        
-        let carPath = UIBezierPath()
-        carPath.move(to: carCenter)
-        carPath.addLine(to: CGPoint(x: CGFloat(carVector.x) + carCenter.x, y: CGFloat(carVector.y) + carCenter.y))
-        carPath.addLine(to: .zero)
+        let vectorToCarFromCenter = Vector(x: carCenter.x - turnCircleCenter.x, y: carCenter.y - turnCircleCenter.y)
+
         let startAngle = Float(atan2(Double(vectorToCarFromCenter.y), Double(vectorToCarFromCenter.x)))
         var endAngle = startAngle
         var newPositionX: Float = 0.0
         var newPositionY: Float = 0.0
         var newVector = vectorToCarFromCenter
+        
+        /// поиск угла, до которого будет происходить поворот по дуге
+        
         while carVector.angle(withVector: destinationVector) >= 2 * eps {
             newVector = newVector.rotated(angle: CGFloat((clockwise ? eps: -eps)))
             newPositionX = newVector.x + Float(turnCircleCenter.x)
@@ -126,6 +115,9 @@ class RoadViewController: UIViewController {
         arcAnimation.duration = Double(timeInTurn + timeInRide)
         arcAnimation.fillMode = .forwards
         arcAnimation.isRemovedOnCompletion = false
+        arcAnimation.delegate = self
+        
+        /// поиск кратчайшего поворота до конечного угла
         
         let firstValue = abs((Float(atan2(Double(carVector.y), Double(carVector.x))) + Float(.pi / 2.0)) - angle)
         let secondValue = abs((Float(atan2(Double(carVector.y), Double(carVector.x))) + Float(.pi / 2.0) - 2 * .pi) - angle)
@@ -135,9 +127,6 @@ class RoadViewController: UIViewController {
         } else {
             endValue = Float(atan2(Double(carVector.y), Double(carVector.x))) + Float(.pi / 2.0) - 2 * .pi
         }
-        
-        print(firstValue - secondValue)
-        
         
         let rotation = CABasicAnimation(keyPath: "transform.rotation")
         rotation.fromValue = angle
@@ -152,5 +141,27 @@ class RoadViewController: UIViewController {
         carView.transform = CGAffineTransform(rotationAngle: CGFloat(angle))
         carView.layer.add(arcAnimation, forKey: nil)
         carView.layer.add(rotation, forKey: nil)
+    }
+}
+
+extension RoadViewController: CAAnimationDelegate {
+    
+    func animationDidStart(_ anim: CAAnimation) {
+        guard let recognizer = carControlRecognizer else {
+            return
+        }
+        
+        view.removeGestureRecognizer(recognizer)
+    }
+    
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        guard let recognizer = carControlRecognizer else {
+            return
+        }
+        
+        if flag {
+            view.addGestureRecognizer(recognizer)
+        }
+        
     }
 }
