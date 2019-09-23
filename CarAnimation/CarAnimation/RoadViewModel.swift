@@ -9,8 +9,12 @@
 import Foundation
 import CoreGraphics.CGGeometry
 
+enum AnimationMethod {
+    case simple, difficult
+}
+
 protocol CarAnimationCalculating {
-    func calculateAnimation(start: CGPoint, destination: CGPoint, carFrame: CGRect) -> [AnimationParametersDataObject]?
+    func calculateAnimation(start: CGPoint, destination: CGPoint, carFrame: CGRect, type: AnimationMethod) -> [AnimationParametersDataObject]?
 }
 
 class RoadViewModel {
@@ -25,6 +29,6 @@ class RoadViewModel {
     }
     
     func configureAnimations(start: CGPoint, destination: CGPoint, carFrame: CGRect) -> [AnimationParametersDataObject]? {
-        return animationCalculationService?.calculateAnimation(start: start, destination: destination, carFrame: carFrame)
+        return animationCalculationService?.calculateAnimation(start: start, destination: destination, carFrame: carFrame, type: .simple)
     }
 }

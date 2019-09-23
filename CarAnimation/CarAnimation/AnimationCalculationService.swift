@@ -12,10 +12,20 @@ import CoreGraphics.CGGeometry
 class AnimationCalculationService: CarAnimationCalculating {
     private var angle: Float = 0.0
     private let eps: Float = .pi / 40.0
-    private let speed: Float = 100.0
+    private let speed: Float = 150.0
     private let turnSpeed: Float = .pi
+    private let simpleRotationDuration = 0.2
     
-    func calculateAnimation(start: CGPoint, destination: CGPoint, carFrame: CGRect) -> [AnimationParametersDataObject]? {
+    func calculateAnimation(start: CGPoint, destination: CGPoint, carFrame: CGRect, type: AnimationMethod) -> [AnimationParametersDataObject]? {
+        switch type {
+        case .difficult:
+            return calculateDifficultAnimation(start: start, destination: destination, carFrame: carFrame)
+        case .simple:
+            return calculateSimpleAnimation(start: start, destination: destination)
+        }
+    }
+    
+    func calculateDifficultAnimation(start: CGPoint, destination: CGPoint, carFrame: CGRect) -> [AnimationParametersDataObject]? {
         let carFrontPoint = CGPoint(x: carFrame.minX + carFrame.width / 2.0, y: carFrame.minY)
         var carVector = Vector(firstPoint: start, secondPoint: carFrontPoint).rotated(angle: CGFloat(angle)) // вектор повернут на угол, заданный предыдущим поворотом
         var destinationVector = Vector(x: destination.x - start.x, y: destination.y - start.y)
@@ -86,5 +96,16 @@ class AnimationCalculationService: CarAnimationCalculating {
         let animationPositionObject = AnimationParametersDataObject(type: .positionWithNaturalTurn(start: start, end: destination, arcCenter: turnCircleCenter, arcRadius: CGFloat(turnCircleRadius), startAngle: CGFloat(startAngle), endAngle: CGFloat(endAngle), clockwise: clockwise), duration: Double(timeInTurn + timeInRide))
         angle = endValue
         return [animationRotateObject, animationPositionObject]
+    }
+    
+    
+    func calculateSimpleAnimation(start: CGPoint, destination: CGPoint) -> [AnimationParametersDataObject]? {
+        let destinationVector = Vector(x: destination.x - start.x, y: destination.y - start.y)
+        let rotateAngle = Float(atan2(Double(destinationVector.y), Double(destinationVector.x))) + Float(.pi / 2.0)
+        let timeInRide = Vector(firstPoint: start, secondPoint: destination).length() / speed
+        let animationPositionObject = AnimationParametersDataObject(type: .simplePosition(start: start, end: destination), duration: Double(timeInRide))
+        let animationRotationObject = AnimationParametersDataObject(type: .rotate(startAngle: angle, rotateAngle: rotateAngle), duration: simpleRotationDuration)
+        angle = rotateAngle
+        return [animationPositionObject, animationRotationObject]
     }
 }

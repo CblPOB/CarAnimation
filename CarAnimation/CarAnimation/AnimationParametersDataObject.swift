@@ -12,6 +12,7 @@ import CoreGraphics.CGGeometry
 enum AnimationType {
     case rotate(startAngle: Float, rotateAngle: Float)
     case positionWithNaturalTurn(start: CGPoint, end: CGPoint, arcCenter: CGPoint, arcRadius: CGFloat, startAngle: CGFloat, endAngle: CGFloat, clockwise: Bool)
+    case simplePosition(start: CGPoint, end: CGPoint)
 }
 
 struct AnimationParametersDataObject {

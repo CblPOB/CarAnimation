@@ -35,6 +35,13 @@ class AnimationBuilder: CarAnimating {
                 animations.append(animation)
                 endAngle = CGFloat(rotateAngle)
                 break
+            case .simplePosition(let start, let end):
+                let animation = buildSimplePositionAnimation(start: start, destination: end)
+                animation.duration = dataObject.duration
+                animation.delegate = delegate
+                animations.append(animation)
+                endPosition = end
+                break
             }
         }
         
@@ -58,8 +65,18 @@ class AnimationBuilder: CarAnimating {
         let rotation = CABasicAnimation(keyPath: "transform.rotation")
         rotation.fromValue = startAngle
         rotation.toValue = endAngle
+//        rotation.beginTime = 0.5
         rotation.fillMode = .forwards
         rotation.isRemovedOnCompletion = false
         return rotation
+    }
+    
+    private func buildSimplePositionAnimation(start: CGPoint, destination: CGPoint) -> CAAnimation {
+        let positionAnimation = CABasicAnimation(keyPath: "position")
+        positionAnimation.fromValue = start
+        positionAnimation.toValue = destination
+        positionAnimation.fillMode = .forwards
+        positionAnimation.isRemovedOnCompletion = false
+        return positionAnimation
     }
 }
