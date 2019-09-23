@@ -13,6 +13,12 @@
 		030A5CE7232DFC94004C56F6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 030A5CE5232DFC94004C56F6 /* LaunchScreen.storyboard */; };
 		030A5CEF232DFFE8004C56F6 /* RoadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 030A5CEE232DFFE8004C56F6 /* RoadViewController.swift */; };
 		035D2E342330D987005C6B93 /* Vector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035D2E332330D986005C6B93 /* Vector.swift */; };
+		03AA61462338830F0046F5E4 /* CarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03AA61452338830F0046F5E4 /* CarView.swift */; };
+		03AA6148233883970046F5E4 /* RoadViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03AA6147233883970046F5E4 /* RoadViewModel.swift */; };
+		03AA614A233883B60046F5E4 /* AnimationParametersDataObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03AA6149233883B60046F5E4 /* AnimationParametersDataObject.swift */; };
+		03AA614C233886580046F5E4 /* AnimationBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03AA614B233886580046F5E4 /* AnimationBuilder.swift */; };
+		03AA614E23388F250046F5E4 /* AnimationCalculationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03AA614D23388F250046F5E4 /* AnimationCalculationService.swift */; };
+		03AA61522338A0590046F5E4 /* CarAnimationObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03AA61512338A0590046F5E4 /* CarAnimationObject.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +30,12 @@
 		030A5CE8232DFC94004C56F6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		030A5CEE232DFFE8004C56F6 /* RoadViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoadViewController.swift; sourceTree = "<group>"; };
 		035D2E332330D986005C6B93 /* Vector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vector.swift; sourceTree = "<group>"; };
+		03AA61452338830F0046F5E4 /* CarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarView.swift; sourceTree = "<group>"; };
+		03AA6147233883970046F5E4 /* RoadViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoadViewModel.swift; sourceTree = "<group>"; };
+		03AA6149233883B60046F5E4 /* AnimationParametersDataObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationParametersDataObject.swift; sourceTree = "<group>"; };
+		03AA614B233886580046F5E4 /* AnimationBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationBuilder.swift; sourceTree = "<group>"; };
+		03AA614D23388F250046F5E4 /* AnimationCalculationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationCalculationService.swift; sourceTree = "<group>"; };
+		03AA61512338A0590046F5E4 /* CarAnimationObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarAnimationObject.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,7 +74,13 @@
 				030A5CE5232DFC94004C56F6 /* LaunchScreen.storyboard */,
 				030A5CE8232DFC94004C56F6 /* Info.plist */,
 				030A5CEE232DFFE8004C56F6 /* RoadViewController.swift */,
+				03AA6147233883970046F5E4 /* RoadViewModel.swift */,
 				035D2E332330D986005C6B93 /* Vector.swift */,
+				03AA61452338830F0046F5E4 /* CarView.swift */,
+				03AA6149233883B60046F5E4 /* AnimationParametersDataObject.swift */,
+				03AA614B233886580046F5E4 /* AnimationBuilder.swift */,
+				03AA614D23388F250046F5E4 /* AnimationCalculationService.swift */,
+				03AA61512338A0590046F5E4 /* CarAnimationObject.swift */,
 			);
 			path = CarAnimation;
 			sourceTree = "<group>";
@@ -139,6 +157,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				030A5CEF232DFFE8004C56F6 /* RoadViewController.swift in Sources */,
+				03AA61462338830F0046F5E4 /* CarView.swift in Sources */,
+				03AA6148233883970046F5E4 /* RoadViewModel.swift in Sources */,
+				03AA61522338A0590046F5E4 /* CarAnimationObject.swift in Sources */,
+				03AA614A233883B60046F5E4 /* AnimationParametersDataObject.swift in Sources */,
+				03AA614E23388F250046F5E4 /* AnimationCalculationService.swift in Sources */,
+				03AA614C233886580046F5E4 /* AnimationBuilder.swift in Sources */,
 				035D2E342330D987005C6B93 /* Vector.swift in Sources */,
 				030A5CDD232DFC91004C56F6 /* AppDelegate.swift in Sources */,
 			);
@@ -286,7 +310,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = CarAnimation/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -294,6 +320,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.syrov.CarAnimation;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -303,7 +330,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = CarAnimation/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -311,6 +340,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.syrov.CarAnimation;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

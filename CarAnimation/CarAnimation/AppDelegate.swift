@@ -15,7 +15,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        if let rootViewController = window?.rootViewController as? RoadViewController {
+            rootViewController.viewModel = RoadViewModel(animationService: AnimationCalculationService())
+        }
         return true
     }
 
